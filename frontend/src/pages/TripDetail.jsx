@@ -25,11 +25,11 @@ const TripDetail = () => {
   const fetchTripData = async () => {
     try {
       const [tripRes, expensesRes, settlementsRes] = await Promise.all([
-        API.get(`/api/trips/${id}`), // ✅ FIXED
-        API.get(`/api/expenses/trip/${id}`), // ✅ FIXED
-        API.get(`/api/expenses/trip/${id}/settlements`) // ✅ FIXED
+        API.get(`/api/trips/${id}`),
+        API.get(`/api/expenses/trip/${id}`),
+        API.get(`/api/expenses/trip/${id}/settlements`)
       ]);
-      
+
       setTrip(tripRes.data);
       setExpenses(expensesRes.data);
       setSettlements(settlementsRes.data.settlements);
@@ -51,7 +51,7 @@ const TripDetail = () => {
       socket.on('new_expense', (newExpense) => {
         setExpenses((prev) => [newExpense, ...prev]);
 
-        API.get(`/api/expenses/trip/${id}/settlements`).then(res => { // ✅ FIXED
+        API.get(`/api/expenses/trip/${id}/settlements`).then(res => {
           setSettlements(res.data.settlements);
           setStats(res.data.stats);
         });
@@ -75,7 +75,7 @@ const TripDetail = () => {
 
   const handleAddExpense = async (payload) => {
     try {
-      await API.post('/api/expenses', payload); // ✅ FIXED
+      await API.post('/api/expenses', payload);
       setShowExpenseForm(false);
       fetchTripData();
     } catch (err) {
@@ -88,8 +88,6 @@ const TripDetail = () => {
     navigator.clipboard.writeText(trip.inviteCode);
     alert('Invite code copied to clipboard!');
   };
-
-  // ✅ BELOW THIS — NO CHANGE (YOUR UI SAME)
 
   if (loading) {
     return (
@@ -107,13 +105,36 @@ const TripDetail = () => {
     <div className="space-y-6">
       <button 
         onClick={() => navigate('/')}
-        className="flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors w-fit"
+        className="flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Dashboard
       </button>
 
-      {/* REST OF YOUR UI EXACT SAME */}
+      <div className="glass rounded-3xl p-6">
+        <h1 className="text-3xl font-bold">{trip.name}</h1>
+        <p>{trip.members.length} Members</p>
+      </div>
+
+      <div className="flex gap-4">
+        <button onClick={() => setActiveTab('expenses')}>Expenses</button>
+        <button onClick={() => setActiveTab('settlements')}>Settlements</button>
+      </div>
+
+      {activeTab === 'expenses' ? (
+        <div>
+          <button onClick={() => setShowExpenseForm(true)}>Add Expense</button>
+          {expenses.map(e => (
+            <div key={e._id}>{e.description} - ₹{e.amount}</div>
+          ))}
+        </div>
+      ) : (
+        <SettlementList settlements={settlements} members={trip.members} currentUserId={user._id} />
+      )}
+
+      {showExpenseForm && (
+        <ExpenseForm trip={trip} onAdd={handleAddExpense} onCancel={() => setShowExpenseForm(false)} />
+      )}
     </div>
   );
 };
