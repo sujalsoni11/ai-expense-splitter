@@ -21,31 +21,58 @@ const TripDetail = () => {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('expenses'); // expenses, settlements
   const [showExpenseForm, setShowExpenseForm] = useState(false);
+  const API = "https://ai-expense-splitter-g0ff.onrender.com";
 
-  const fetchTripData = async () => {
-   const config = {
-  headers: {
-    Authorization: `Bearer ${user.token}`
+const fetchTripData = async () => {
+  try {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${user?.token}`
+      }
+    };
+
+    const [tripRes, expensesRes, settlementsRes] = await Promise.all([
+      axios.get(`${API}/api/trips/${id}`, config),
+      axios.get(`${API}/api/expenses/trip/${id}`, config),
+      axios.get(`${API}/api/expenses/trip/${id}/settlements`, config)
+    ]);
+
+    setTrip(tripRes.data);
+    setExpenses(expensesRes.data);
+    setSettlements(settlementsRes.data.settlements);
+    setStats(settlementsRes.data.stats);
+  } catch (err) {
+    setError('Failed to load trip details');
+    console.error(err);
+  } finally {
+    setLoading(false);
   }
 };
 
-const [tripRes, expensesRes, settlementsRes] = await Promise.all([
-  axios.get(`${API}/api/trips/${id}`, config),
-  axios.get(`${API}/api/expenses/trip/${id}`, config),
-  axios.get(`${API}/api/expenses/trip/${id}/settlements`, config)
-]);
+//   const fetchTripData = async () => {
+//    const config = {
+//   headers: {
+//     Authorization: `Bearer ${user.token}`
+//   }
+// };
+
+// const [tripRes, expensesRes, settlementsRes] = await Promise.all([
+//   axios.get(`${API}/api/trips/${id}`, config),
+//   axios.get(`${API}/api/expenses/trip/${id}`, config),
+//   axios.get(`${API}/api/expenses/trip/${id}/settlements`, config)
+// ]);
       
-      setTrip(tripRes.data);
-      setExpenses(expensesRes.data);
-      setSettlements(settlementsRes.data.settlements);
-      setStats(settlementsRes.data.stats);
-    } catch (err) {
-      setError('Failed to load trip details');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+//       setTrip(tripRes.data);
+//       setExpenses(expensesRes.data);
+//       setSettlements(settlementsRes.data.settlements);
+//       setStats(settlementsRes.data.stats);
+//     } catch (err) {
+//       setError('Failed to load trip details');
+//       console.error(err);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
 
   useEffect(() => {
     fetchTripData();
@@ -57,7 +84,11 @@ const [tripRes, expensesRes, settlementsRes] = await Promise.all([
         // Optimistically add to list and refetch settlements/stats
         setExpenses((prev) => [newExpense, ...prev]);
         
-        axios.get(`/api/expenses/trip/${id}/settlements`).then(res => {
+        axios.get(`${API}/api/expenses/trip/${id}/settlements`, {
+  headers: {
+    Authorization: `Bearer ${user?.token}`
+  }
+}).then(res => {
           setSettlements(res.data.settlements);
           setStats(res.data.stats);
         });
@@ -79,18 +110,22 @@ const [tripRes, expensesRes, settlementsRes] = await Promise.all([
     };
   }, [id, socket]);
 
-  const handleAddExpense = async (payload) => {
-    try {
-      await axios.post(`${API}/api/expenses`, payload, config);
-      setShowExpenseForm(false);
-      // Not strictly necessary to fetch locally if socket is working, 
-      // but good as a fallback
-      fetchTripData();
-    } catch (err) {
-      console.error(err);
-      alert('Failed to add expense');
-    }
-  };
+const handleAddExpense = async (payload) => {
+  try {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${user?.token}`
+      }
+    };
+
+    await axios.post(`${API}/api/expenses`, payload, config);
+    setShowExpenseForm(false);
+    fetchTripData();
+  } catch (err) {
+    console.error(err);
+    alert('Failed to add expense');
+  }
+};
 
   const copyInviteCode = () => {
     navigator.clipboard.writeText(trip.inviteCode);
