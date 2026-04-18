@@ -26,8 +26,8 @@ const TripDetail = () => {
   const fetchTripData = async () => {
     try {
       const [tripRes, expensesRes, settlementsRes] = await Promise.all([
-        axios.get(`${API}/api/trips/${id}`)
-        axios.get(`${API}/api/expenses/trip/${id}`)
+        axios.get(`${API}/api/trips/${id}`),
+        axios.get(`${API}/api/expenses/trip/${id}`),
         axios.get(`${API}/api/expenses/trip/${id}/settlements`)
       ]);
       
