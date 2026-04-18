@@ -21,13 +21,14 @@ const TripDetail = () => {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('expenses'); // expenses, settlements
   const [showExpenseForm, setShowExpenseForm] = useState(false);
-
+  const API = "https://ai-expense-splitter-g0ff.onrender.com";
+  
   const fetchTripData = async () => {
     try {
       const [tripRes, expensesRes, settlementsRes] = await Promise.all([
-        axios.get(`/api/trips/${id}`),
-        axios.get(`/api/expenses/trip/${id}`),
-        axios.get(`/api/expenses/trip/${id}/settlements`)
+        axios.get(`${API}/api/trips/${id}`)
+        axios.get(`${API}/api/expenses/trip/${id}`)
+        axios.get(`${API}/api/expenses/trip/${id}/settlements`)
       ]);
       
       setTrip(tripRes.data);
@@ -52,7 +53,7 @@ const TripDetail = () => {
         // Optimistically add to list and refetch settlements/stats
         setExpenses((prev) => [newExpense, ...prev]);
         
-        axios.get(`/api/expenses/trip/${id}/settlements`).then(res => {
+        axios.get(`${API}/api/expenses/trip/${id}/settlements`).then(res => {
           setSettlements(res.data.settlements);
           setStats(res.data.stats);
         });
@@ -76,7 +77,7 @@ const TripDetail = () => {
 
   const handleAddExpense = async (payload) => {
     try {
-      await axios.post('/api/expenses', payload);
+      await axios.post(`${API}/api/expenses`, payload);
       setShowExpenseForm(false);
       // Not strictly necessary to fetch locally if socket is working, 
       // but good as a fallback
