@@ -43,7 +43,7 @@ setAmount(data.amount || '');
 setDescription('Scanned Expense');
 
 // ✅ ADD THIS LINE HERE
-setReceiptPath(file.name);
+setReceiptPath(res.data.imageUrl);
 
     // 🔥 Auto-fill fields (IMPORTANT)
     setAmount(data.amount || '');

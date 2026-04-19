@@ -19,9 +19,10 @@ const scanReceipt = async (req, res) => {
     const amount = numbers ? Math.max(...numbers.map(Number)) : 0;
 
     res.json({
-      text,
-      amount
-    });
+  text,
+  amount,
+  imageUrl: `/uploads/${req.file.filename}`
+});
 
   } catch (error) {
     console.error(error);
