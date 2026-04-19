@@ -68,3 +68,8 @@
     background: #94a3b8;
   }
 }
+
+body {
+  background: radial-gradient(circle at 20% 20%, #0f172a, #020617 70%);
+  color: #e2e8f0;
+}
