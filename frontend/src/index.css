@@ -28,21 +28,20 @@
     --bg-color: #020617;
     --text-color: #e2e8f0;
   }
-
-  body {
-    background: radial-gradient(circle at 15% 20%, #0f172a, #020617 70%);
-    color: var(--text-color);
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-    min-height: 100vh;
-  }
+body {
+  background: #000000;
+  color: #e5e7eb;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
 
   /* Subtle Apple-style glow */
   body::before {
     content: "";
     position: fixed;
     inset: 0;
-    background: radial-gradient(circle at 80% 10%, rgba(59,130,246,0.12), transparent 40%);
+    /* background: radial-gradient(circle at 80% 10%, rgba(59,130,246,0.12), transparent 40%); */
     pointer-events: none;
     z-index: -1;
   }
@@ -97,6 +96,5 @@
 /* Root fix (important for full background) */
 #root {
   min-height: 100vh;
-  background: transparent;
+  background: #000000;
 }
-
