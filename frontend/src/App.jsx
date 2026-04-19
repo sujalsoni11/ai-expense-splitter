@@ -15,7 +15,7 @@ function App() {
     <Router>
       <AuthProvider>
         <SocketProvider>
-          <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-50 transition-colors duration-200">
+          <div>
             <Navbar />
             <main className="container mx-auto px-4 py-8">
               <Routes>
