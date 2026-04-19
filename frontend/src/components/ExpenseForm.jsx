@@ -1,3 +1,4 @@
+import API from '../api';
 import { useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
@@ -19,37 +20,42 @@ const ExpenseForm = ({ trip, onAdd, onCancel }) => {
   const [ocrError, setOcrError] = useState('');
   const [receiptPath, setReceiptPath] = useState(null);
 
-  const handleOcrUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+const handleOcrUpload = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
-    setIsScanning(true);
-    setOcrError('');
-    
-    const formData = new FormData();
-    formData.append('receipt', file);
+  setIsScanning(true);
+  setOcrError('');
 
-    try {
-      const res = await axios.post('/api/ocr/scan', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-      
-      if (res.data.amount) {
-        setAmount(res.data.amount.toString());
-        recalculateSplits(res.data.amount, splitAmong, splitMethod);
-      } else {
-        setOcrError('Could not detect amount automatically. Please enter manually.');
-      }
-      setReceiptPath(res.data.receiptImage);
-    } catch (err) {
-      setOcrError('Receipt scan failed.');
-      console.error(err);
-    } finally {
-      setIsScanning(false);
-    }
-  };
+  const formData = new FormData();
+  formData.append('receipt', file);
+
+  try {
+    const res = await API.post('/api/ocr/scan', formData, {
+  headers: {
+    'Content-Type': 'multipart/form-data'
+  }
+});
+
+    const data = res.data;
+
+setAmount(data.amount || '');
+setDescription('Scanned Expense');
+
+// ✅ ADD THIS LINE HERE
+setReceiptPath(file.name);
+
+    // 🔥 Auto-fill fields (IMPORTANT)
+    setAmount(data.amount || '');
+    setDescription('Scanned Expense');
+
+  } catch (err) {
+    console.error(err);
+    setOcrError('OCR failed');
+  } finally {
+    setIsScanning(false);
+  }
+};
 
   const recalculateSplits = (totalAmt, currentSplits, method) => {
     const numericAmt = parseFloat(totalAmt) || 0;
