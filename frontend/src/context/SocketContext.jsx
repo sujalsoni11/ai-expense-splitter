@@ -10,14 +10,21 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      // Create socket connection
-      const newSocket = io(); // Connects to the host that serves the page, proxy handles it
+      // Connect to backend (Render)
+      const newSocket = io("https://ai-expense-splitter-g0ff.onrender.com", {
+        transports: ["websocket"],
+        withCredentials: true,
+      });
+
       setSocket(newSocket);
 
-      return () => newSocket.close();
+      // Cleanup on unmount / logout
+      return () => {
+        newSocket.disconnect();
+      };
     } else {
       if (socket) {
-        socket.close();
+        socket.disconnect();
         setSocket(null);
       }
     }
