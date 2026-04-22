@@ -12,12 +12,12 @@ const Dashboard = ({ user, trips }) => {
 
   const handleCreateTrip = (e) => {
     e.preventDefault();
-    // TODO: add your backend logic
+    // TODO: backend logic
   };
 
   const handleJoinTrip = (e) => {
     e.preventDefault();
-    // TODO: add your backend logic
+    // TODO: backend logic
   };
 
   return (
@@ -27,7 +27,7 @@ const Dashboard = ({ user, trips }) => {
       <header className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight text-white">
-            Welcome, {user?.name?.split(' ')[0]}
+            Welcome, {user?.name?.split(" ")[0] || "User"}
           </h1>
           <p className="text-slate-400 text-sm mt-1">
             Manage your shared expenses effortlessly.
@@ -54,7 +54,7 @@ const Dashboard = ({ user, trips }) => {
       </header>
 
       {/* EMPTY STATE */}
-      {trips.length === 0 ? (
+      {!trips || trips.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-2xl py-28 text-center shadow-[0_20px_80px_rgba(0,0,0,0.6)]">
 
           <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-400">
@@ -73,10 +73,10 @@ const Dashboard = ({ user, trips }) => {
 
         /* TRIP CARDS */
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {trips.map((trip) => (
+          {trips?.map((trip, index) => (
             <Link
-              key={trip._id}
-              to={`/trip/${trip._id}`}
+              key={trip?._id || index}
+              to={`/trip/${trip?._id}`}
               className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_25px_80px_rgba(0,0,0,0.7)]"
             >
 
@@ -87,7 +87,7 @@ const Dashboard = ({ user, trips }) => {
 
                 <div className="mb-4 flex justify-between">
                   <h3 className="text-lg font-semibold text-white">
-                    {trip.name}
+                    {trip?.name || "Untitled Trip"}
                   </h3>
 
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-slate-300 group-hover:bg-blue-500/20 group-hover:text-blue-400 transition">
@@ -98,12 +98,12 @@ const Dashboard = ({ user, trips }) => {
                 <div className="flex justify-between text-sm">
                   <div className="flex items-center gap-2 text-slate-400">
                     <Users className="h-4 w-4" />
-                    {trip.members?.length || 1}
+                    {trip?.members?.length || 1}
                   </div>
 
-                  {trip.budget > 0 && (
+                  {trip?.budget > 0 && (
                     <div className="flex items-center gap-1 text-white font-medium">
-                      ₹{trip.budget}
+                      ₹{trip?.budget}
                     </div>
                   )}
                 </div>
