@@ -2,7 +2,7 @@ import API from '../api';
 import { useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-import { Camera, RefreshCw, Plus, X } from 'lucide-react';
+import { Camera, RefreshCw, Plus, X, Upload } from 'lucide-react';
 
 const ExpenseForm = ({ trip, onAdd, onCancel }) => {
   const { user } = useContext(AuthContext);
@@ -134,28 +134,38 @@ setReceiptPath(res.data.imageUrl);
         </button>
       </div>
 
-      <div className="mb-6 rounded-xl border-2 border-dashed border-blue-200 bg-blue-50/50 p-4 text-center transition-colors dark:border-blue-900/50 dark:bg-blue-900/10">
-        <label className="flex cursor-pointer flex-col items-center justify-center gap-2">
-          {isScanning ? (
-            <>
-              <RefreshCw className="h-8 w-8 animate-spin text-blue-500" />
-              <span className="text-sm font-medium text-blue-600 dark:text-blue-400">Scanning Receipt with AI...</span>
-            </>
-          ) : (
-            <>
-              <div className="rounded-full bg-blue-100 p-3 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400">
-                <Camera className="h-6 w-6" />
+      <div className="mb-6">
+        <h4 className="mb-3 text-sm font-medium text-slate-700 dark:text-slate-300 text-center">Scan Receipt with AI (Auto-fill amount)</h4>
+        {isScanning ? (
+          <div className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-blue-200 bg-blue-50/50 p-6 text-center dark:border-blue-900/50 dark:bg-blue-900/10">
+            <RefreshCw className="h-8 w-8 animate-spin text-blue-500" />
+            <span className="text-sm font-medium text-blue-600 dark:text-blue-400">Scanning Receipt with AI...</span>
+          </div>
+        ) : (
+          <div className="flex gap-3">
+            <label className="flex flex-1 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-blue-200 bg-blue-50/50 p-4 text-center transition-colors hover:bg-blue-100/50 dark:border-blue-900/50 dark:bg-blue-900/10 dark:hover:bg-blue-900/20">
+              <div className="rounded-full bg-blue-100 p-2 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400">
+                <Camera className="h-5 w-5" />
               </div>
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                Scan Receipt with AI (Auto-fill amount)
+              <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                Camera
               </span>
-              <span className="text-xs text-slate-500">Upload JPG/PNG</span>
-            </>
-          )}
-          <input type="file" className="hidden" accept="image/*" onChange={handleOcrUpload} disabled={isScanning} />
-        </label>
-        {ocrError && <p className="mt-2 text-xs text-red-500">{ocrError}</p>}
-        {receiptPath && <p className="mt-2 text-xs text-green-600 dark:text-green-400">Receipt scanned successfully</p>}
+              <input type="file" className="hidden" accept="image/*" capture="environment" onChange={handleOcrUpload} disabled={isScanning} />
+            </label>
+
+            <label className="flex flex-1 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-blue-200 bg-blue-50/50 p-4 text-center transition-colors hover:bg-blue-100/50 dark:border-blue-900/50 dark:bg-blue-900/10 dark:hover:bg-blue-900/20">
+              <div className="rounded-full bg-blue-100 p-2 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400">
+                <Upload className="h-5 w-5" />
+              </div>
+              <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                Upload File
+              </span>
+              <input type="file" className="hidden" accept="image/*" onChange={handleOcrUpload} disabled={isScanning} />
+            </label>
+          </div>
+        )}
+        {ocrError && <p className="mt-2 text-center text-xs text-red-500">{ocrError}</p>}
+        {receiptPath && <p className="mt-2 text-center text-xs text-green-600 dark:text-green-400">Receipt scanned successfully</p>}
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
