@@ -1,8 +1,12 @@
 const vision = require('@google-cloud/vision');
 const path = require('path');
+const fs = require('fs');
+
+const renderSecretPath = '/etc/secrets/vision-key.json';
+const localPath = path.join(__dirname, '../vision-key.json');
 
 const client = new vision.ImageAnnotatorClient({
-  keyFilename: path.join(__dirname, '../vision-key.json')
+  keyFilename: fs.existsSync(renderSecretPath) ? renderSecretPath : localPath
 });
 
 const scanReceipt = async (req, res) => {
