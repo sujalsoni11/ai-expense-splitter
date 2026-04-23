@@ -14,7 +14,8 @@ const scanReceipt = async (req, res) => {
     );
 
     // Extract max amount (Basic regex setup for prices)
-    const numbers = text.match(/\d+(\.\d{1,2})?/g);
+    const cleanText = text.replace(/,/g, '');
+    const numbers = cleanText.match(/\d+(\.\d{1,2})?/g);
     const amount = numbers ? Math.max(...numbers.map(Number)) : 0;
 
     res.json({
