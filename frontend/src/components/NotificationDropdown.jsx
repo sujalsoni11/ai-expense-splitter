@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import API from '../api';
 import { Bell } from 'lucide-react';
 
 const NotificationDropdown = () => {
@@ -9,7 +9,7 @@ const NotificationDropdown = () => {
 
   const fetchNotifications = async () => {
     try {
-      const res = await axios.get('/api/notifications');
+      const res = await API.get('/api/notifications');
       setNotifications(res.data);
     } catch (err) {
       console.error(err);
@@ -32,7 +32,7 @@ const NotificationDropdown = () => {
 
   const markAsRead = async (id) => {
     try {
-      await axios.put(`/api/notifications/${id}/read`);
+      await API.put(`/api/notifications/${id}/read`);
       setNotifications(notifications.map(n => 
         n._id === id ? { ...n, read: true } : n
       ));
