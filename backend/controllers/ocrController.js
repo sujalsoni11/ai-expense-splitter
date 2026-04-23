@@ -1,8 +1,8 @@
 const vision = require('@google-cloud/vision');
+const path = require('path');
 
 const client = new vision.ImageAnnotatorClient({
-  // Use keyFilename locally if provided, otherwise you might want to use environment variables in deployment
-  keyFilename: './vision-key.json' 
+  keyFilename: path.join(__dirname, '../vision-key.json')
 });
 
 const scanReceipt = async (req, res) => {
