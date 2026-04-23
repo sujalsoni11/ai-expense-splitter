@@ -1,8 +1,14 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Users, Plus, Wallet, ArrowRight } from "lucide-react";
+import { AuthContext } from "../context/AuthContext";
+import API from "../api";
 
-const Dashboard = ({ user, trips }) => {
+const Dashboard = () => {
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const [trips, setTrips] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [newTripName, setNewTripName] = useState("");
@@ -10,15 +16,52 @@ const Dashboard = ({ user, trips }) => {
   const [joinCode, setJoinCode] = useState("");
   const [error, setError] = useState("");
 
-  const handleCreateTrip = (e) => {
-    e.preventDefault();
-    // TODO: backend logic
+  const fetchTrips = async () => {
+    try {
+      const res = await API.get('/api/trips');
+      setTrips(res.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleJoinTrip = (e) => {
+  useEffect(() => {
+    fetchTrips();
+  }, []);
+
+  const handleCreateTrip = async (e) => {
     e.preventDefault();
-    // TODO: backend logic
+    setError("");
+    try {
+      const res = await API.post('/api/trips', {
+        name: newTripName,
+        budget: Number(newTripBudget) || 0
+      });
+      setTrips([...trips, res.data]);
+      setShowCreateModal(false);
+      setNewTripName("");
+      setNewTripBudget("");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to create trip");
+    }
   };
+
+  const handleJoinTrip = async (e) => {
+    e.preventDefault();
+    setError("");
+    try {
+      const res = await API.post('/api/trips/join', { inviteCode: joinCode });
+      setTrips([...trips, res.data.trip]);
+      setShowJoinModal(false);
+      setJoinCode("");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to join trip");
+    }
+  };
+  
+  if (isLoading) return <div className="text-center py-20 text-white">Loading trips...</div>;
 
   return (
     <div className="space-y-10 px-2 sm:px-4">
