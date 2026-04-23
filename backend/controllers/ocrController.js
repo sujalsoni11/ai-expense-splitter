@@ -1,13 +1,5 @@
-const vision = require('@google-cloud/vision');
+const Tesseract = require('tesseract.js');
 const path = require('path');
-const fs = require('fs');
-
-const renderSecretPath = '/etc/secrets/vision-key.json';
-const localPath = path.join(__dirname, '../vision-key.json');
-
-const client = new vision.ImageAnnotatorClient({
-  keyFilename: fs.existsSync(renderSecretPath) ? renderSecretPath : localPath
-});
 
 const scanReceipt = async (req, res) => {
   try {
@@ -15,10 +7,13 @@ const scanReceipt = async (req, res) => {
       return res.status(400).json({ message: 'No image uploaded' });
     }
 
-    const [result] = await client.textDetection(req.file.path);
-    const text = result.fullTextAnnotation?.text || "";
+    const { data: { text } } = await Tesseract.recognize(
+      req.file.path,
+      'eng',
+      { logger: m => console.log(m) }
+    );
 
-    // Extract max amount
+    // Extract max amount (Basic regex setup for prices)
     const numbers = text.match(/\d+(\.\d{1,2})?/g);
     const amount = numbers ? Math.max(...numbers.map(Number)) : 0;
 
@@ -29,9 +24,9 @@ const scanReceipt = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Google Vision OCR Error:", error);
+    console.error("Tesseract OCR Error:", error);
     res.status(500).json({ 
-      message: 'OCR failed. Please ensure vision-key.json is present and valid.',
+      message: 'OCR failed using local engine',
       error: error.message 
     });
   }
