@@ -16,7 +16,7 @@ const addExpense = async (req, res) => {
       return res.status(404).json({ message: 'Trip not found' });
     }
 
-    if (!trip.members.includes(req.user._id)) {
+    if (!trip.members.some(member => member.toString() === req.user._id.toString())) {
       return res.status(403).json({ message: 'User is not a member of this trip' });
     }
 

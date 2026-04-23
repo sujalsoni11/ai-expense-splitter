@@ -37,6 +37,6 @@ const upload = multer({
   }
 });
 
-router.post('/scan', upload.single('receipt'), scanReceipt);
+router.post('/scan', protect, upload.single('receipt'), scanReceipt);
 
 module.exports = router;
